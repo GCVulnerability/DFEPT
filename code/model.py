@@ -113,3 +113,38 @@ class DefectModel(nn.Module):
             return loss, prob
         else:
             return prob
+
+class ModelT(nn.Module):
+    def __init__(self, encoder, config, tokenizer, args):
+        super(ModelT, self).__init__()
+        self.encoder = encoder
+        self.config = config
+        self.tokenizer = tokenizer
+        self.args = args
+
+
+        # Define dropout layer, dropout_probability is taken from args.
+        self.dropout = nn.Dropout(args.dropout_probability)
+        self.classifier = PredictionClassification(config, args, input_size=768)
+
+    def forward(self, input_ids=None, labels=None):
+        attention_mask = input_ids.ne(self.tokenizer.pad_token_id)
+        vec = self.encoder(input_ids=input_ids, attention_mask=attention_mask)[0][:, 0, :]
+        outputs = self.classifier(vec)
+
+
+
+        # outputs = self.encoder(input_ids, attention_mask=input_ids.ne(1))[0]
+        # Apply dropout
+        outputs = self.dropout(outputs)
+
+        logits = outputs
+        prob = torch.sigmoid(logits)
+        if labels is not None:
+            labels = labels.float()
+            loss = torch.log(prob[:, 0] + 1e-10) * labels + torch.log((1 - prob)[:, 0] + 1e-10) * (1 - labels)
+            loss = -loss.mean()
+            return loss, prob
+        else:
+            return prob
+

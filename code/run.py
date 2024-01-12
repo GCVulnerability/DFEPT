@@ -41,6 +41,7 @@ except:
     from tensorboardX import SummaryWriter
 
 from tqdm import tqdm, trange
+from sklearn.metrics import f1_score, precision_score, recall_score
 import multiprocessing
 from model import Model, DefectModel
 cpu_cont = multiprocessing.cpu_count()
@@ -49,7 +50,7 @@ from transformers import (WEIGHTS_NAME, AdamW, get_linear_schedule_with_warmup,
                           GPT2Config, GPT2LMHeadModel, GPT2Tokenizer,
                           OpenAIGPTConfig, OpenAIGPTLMHeadModel, OpenAIGPTTokenizer,
                           RobertaConfig, RobertaForSequenceClassification, RobertaTokenizer,RobertaModel,
-                          T5Config, T5ForConditionalGeneration, T5Tokenizer,
+                          T5Config, T5Model, T5Tokenizer,T5ForConditionalGeneration,
                           DistilBertConfig, DistilBertForMaskedLM, DistilBertForSequenceClassification, DistilBertTokenizer)
 
 logger = logging.getLogger(__name__)
@@ -60,10 +61,8 @@ MODEL_CLASSES = {
     'bert': (BertConfig, BertForSequenceClassification, BertTokenizer),
     'roberta': (RobertaConfig, RobertaModel, RobertaTokenizer),
     'distilbert': (DistilBertConfig, DistilBertForSequenceClassification, DistilBertTokenizer),
-    'codet5': (T5Config, T5ForConditionalGeneration, RobertaTokenizer),
+    'codet5': (T5Config, T5Model, RobertaTokenizer),
 }
-
-
 
 class InputFeatures(object):
     """A single training/test features for a example."""
@@ -327,12 +326,18 @@ def evaluate(args, model, tokenizer,eval_when_training=False):
     labels=np.concatenate(labels,0)
     preds=logits[:,0]>0.5
     eval_acc=np.mean(labels==preds)
+    f1 = f1_score(labels, preds)
+    precision = precision_score(labels, preds)
+    recall = recall_score(labels, preds)
     eval_loss = eval_loss / nb_eval_steps
     perplexity = torch.tensor(eval_loss)
             
     result = {
         "eval_loss": float(perplexity),
         "eval_acc":round(eval_acc,4),
+        'f1_score': round(f1, 4),
+        'precision' :round(precision, 4),
+        'recall': round(recall, 4),
     }
     return result
 

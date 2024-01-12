@@ -39,16 +39,16 @@ try:
     from torch.utils.tensorboard import SummaryWriter
 except:
     from tensorboardX import SummaryWriter
-
+from sklearn.metrics import f1_score, precision_score, recall_score
 from tqdm import tqdm, trange
 import multiprocessing
-from model import Model
+from model import ModelT
 cpu_cont = multiprocessing.cpu_count()
 from transformers import (WEIGHTS_NAME, AdamW, get_linear_schedule_with_warmup,
                           BertConfig, BertForMaskedLM, BertTokenizer, BertForSequenceClassification,
                           GPT2Config, GPT2LMHeadModel, GPT2Tokenizer,
                           OpenAIGPTConfig, OpenAIGPTLMHeadModel, OpenAIGPTTokenizer,
-                          RobertaConfig, RobertaForSequenceClassification, RobertaTokenizer,
+                          RobertaConfig, RobertaForSequenceClassification, RobertaTokenizer,RobertaModel,
                           DistilBertConfig, DistilBertForMaskedLM, DistilBertForSequenceClassification, DistilBertTokenizer)
 
 logger = logging.getLogger(__name__)
@@ -57,7 +57,7 @@ MODEL_CLASSES = {
     'gpt2': (GPT2Config, GPT2LMHeadModel, GPT2Tokenizer),
     'openai-gpt': (OpenAIGPTConfig, OpenAIGPTLMHeadModel, OpenAIGPTTokenizer),
     'bert': (BertConfig, BertForSequenceClassification, BertTokenizer),
-    'roberta': (RobertaConfig, RobertaForSequenceClassification, RobertaTokenizer),
+    'roberta': (RobertaConfig, RobertaModel, RobertaTokenizer),
     'distilbert': (DistilBertConfig, DistilBertForSequenceClassification, DistilBertTokenizer)
 }
 
@@ -312,12 +312,18 @@ def evaluate(args, model, tokenizer,eval_when_training=False):
     labels=np.concatenate(labels,0)
     preds=logits[:,0]>0.5
     eval_acc=np.mean(labels==preds)
+    f1 = f1_score(labels, preds)
+    precision = precision_score(labels, preds)
+    recall = recall_score(labels, preds)
     eval_loss = eval_loss / nb_eval_steps
     perplexity = torch.tensor(eval_loss)
-            
+
     result = {
         "eval_loss": float(perplexity),
-        "eval_acc":round(eval_acc,4),
+        "eval_acc": round(eval_acc, 4),
+        'f1_score': round(f1, 4),
+        'precision': round(precision, 4),
+        'recall': round(recall, 4),
     }
     return result
 
@@ -542,7 +548,7 @@ def main():
     else:
         model = model_class(config)
 
-    model=Model(model,config,tokenizer,args)
+    model=ModelT(model,config,tokenizer,args)
     if args.local_rank == 0:
         torch.distributed.barrier()  # End of barrier to make sure only the first process in distributed training download model & vocab
 
