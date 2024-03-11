@@ -1,4 +1,4 @@
-# Improving Pre-Training Model Based Vulnerability Detection with Data Flow Embedding
+# DFEPT: Data Flow Embedding For Enhancing Pre-Training Model Based Vulnerability Detection
 
 ## Requirements
 - Python 3.8
@@ -7,7 +7,12 @@
 - tree-sitter 0.20.4
 - scikit-learn
 
-## RQ1 Efficiency
+## Usage
+
+The repository is partially based on [CodeXGLUE](https://github.com/microsoft/CodeXGLUE/tree/main/Code-Code/Defect-detection).
+
+## Fine-tuning
+
 ### Fine-tune CodeBERT/UnixCoder
 
 ```shell
@@ -60,7 +65,8 @@ cd CodeT5+DFG/code
 python run_exp.py --model_tag codet5_base --task defect --sub_task none
 python run_exp.py --model_tag codet5_base --task defect_reveal --sub_task none
 ```
-## RQ2 Different GNN/Pooling Methods
+## How do different graph embedding and pooling methods affect model performance?
+
 ```shell
 cd DifferentGNN
 python run.py \
@@ -103,5 +109,4 @@ python run.py \
     --evaluate_during_training \
     --seed 123456  2>&1 | tee train.log
 ```
-
 
