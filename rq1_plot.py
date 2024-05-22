@@ -29,18 +29,19 @@ reveal_data = {
 }
 
 # Custom colors for the bars
-colors = ['#B5A1E3', '#E2E7A2', '#F0C2A2', '#ABD0F1']
+colors = ['#B02226', '#F0A12C', '#5EA0C7', '#009E73']
 
 # Adjusted plot function with custom colors and black borders
-def plot_comparison_with_borders(ax, data_original, data_dfept, title):
+def plot_comparison_with_borders(ax, data_original, data_dfept, title, opt=1):
     n_groups = 2  # Number of groups (original model and model with DFEPT)
     index = np.arange(n_groups) * 1.2  # Group positions with increased spacing
     bar_width = 0.2  # Width of the bars
 
     # Find min and max values to set y-axis limits
     all_values = data_original + data_dfept
-    lower_limit = min(all_values) - 0.05 * (max(all_values) - min(all_values))
-    upper_limit = max(all_values) + 0.05 * (max(all_values) - min(all_values))
+    lower_limit = min(all_values) - 0.1 * (max(all_values) - min(all_values))
+    upper_limit1 = max(all_values) + 0.3 * (max(all_values) - min(all_values))
+    upper_limit2 = max(all_values) + 0.05 * (max(all_values) - min(all_values))
 
     # Plotting each metric with custom colors and black borders
     for i, metric in enumerate(metrics):
@@ -48,9 +49,12 @@ def plot_comparison_with_borders(ax, data_original, data_dfept, title):
         ax.bar(index + i * bar_width, original_metrics, bar_width, label=metric, color=colors[i], edgecolor='black')
 
     ax.set_title(title, fontsize=40)
-    ax.set_ylim([lower_limit, upper_limit])
+    if opt ==1:
+        ax.set_ylim([lower_limit, upper_limit1])
+    else:
+        ax.set_ylim([lower_limit, upper_limit2])
     ax.set_xticks(index + bar_width * 1.5)
-    ax.set_xticklabels(['Original', 'DFEPT'], fontsize=32)
+    ax.set_xticklabels(['Only Fine-tuned', 'DFEPT'], fontsize=32)
     ax.legend(prop={'size': 25})
     ax.tick_params(axis='y', labelsize=32)
 
@@ -60,7 +64,7 @@ fig, axs = plt.subplots(2, 4, figsize=(45, 20), constrained_layout=True)
 # Plotting each model comparison on Devign and Reveal datasets with custom colors and black borders
 for i, model in enumerate(models):
     plot_comparison_with_borders(axs[0, i], devign_data[model], devign_data['DFEPT+' + model], f'{model} on Devign')
-    plot_comparison_with_borders(axs[1, i], reveal_data[model], reveal_data['DFEPT+' + model], f'{model} on Reveal')
+    plot_comparison_with_borders(axs[1, i], reveal_data[model], reveal_data['DFEPT+' + model], f'{model} on Reveal',opt=2)
 
 # Saving the figure as a PDF file with 300 DPI
 fig.savefig("Fig4.pdf", dpi=300)

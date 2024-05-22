@@ -17,8 +17,8 @@ plt.figure(figsize=(22, 12))
 
 # Devign 数据集的柱状图
 plt.subplot(1, 2, 1)  # 1行2列，当前是第1个图
-plt.bar(x - bar_width/2, ggnn_acc, bar_width, label='GGNN', color='#B5A1E3', edgecolor='black')
-plt.bar(x + bar_width/2, gcn_acc, bar_width, label='GCN', color='#F0C2A2', edgecolor='black')
+plt.bar(x - bar_width/2, ggnn_acc, bar_width, label='GGNN', color='#B02226', edgecolor='black')
+plt.bar(x + bar_width/2, gcn_acc, bar_width, label='GCN', color='#5EA0C7', edgecolor='black')
 plt.xlabel('Pooling Method', fontsize=32)
 plt.ylabel('Accuracy', fontsize=32)
 plt.title('Devign', fontsize=40)
@@ -28,8 +28,8 @@ plt.legend(prop={'size': 30})
 
 # Reveal 数据集的柱状图
 plt.subplot(1, 2, 2)  # 1行2列，当前是第2个图
-plt.bar(x - bar_width/2, ggnn_acc_reveal, bar_width, label='GGNN', color='#B5A1E3', edgecolor='black')
-plt.bar(x + bar_width/2, gcn_acc_reveal, bar_width, label='GCN', color='#F0C2A2', edgecolor='black')
+plt.bar(x - bar_width/2, ggnn_acc_reveal, bar_width, label='GGNN', color='#B02226', edgecolor='black')
+plt.bar(x + bar_width/2, gcn_acc_reveal, bar_width, label='GCN', color='#5EA0C7', edgecolor='black')
 plt.xlabel('Pooling Method', fontsize=32)
 plt.title('Reveal', fontsize=40)
 plt.xticks(x, models)
